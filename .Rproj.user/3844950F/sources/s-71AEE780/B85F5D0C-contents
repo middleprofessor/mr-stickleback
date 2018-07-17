@@ -9,6 +9,8 @@ output:
 
 ## Can we reproduce Table 1 from these methods?
 
+Hint: there is not enough information in these methods to precisely reproduce Table 1. But the numbers should be close. I have the extra information necessary to reproduce Table 1.
+
 >We estimated selection coefficients (standardized partial regression coefficients) using the method for cross-sectional data (Lande and Arnold 1983)
 
 \begin{equation}

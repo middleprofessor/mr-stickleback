@@ -9,4 +9,79 @@ Unpacking objects:  25% (1/4)   Unpacking objects:  50% (2/4)   Unpacking obje
 From github.com:middleprofessor/mr-stickleback
  * branch            master     -> FETCH_HEAD
  * [new branch]      master     -> origin/master
+]0;~/Documents/Github projects/Lab projects/MR sticklebackJeff-Walkers-imac:MR stickleback walker$ git add . # indexes all files that wil be a dded to the local repo
+]0;~/Documents/Github projects/Lab projects/MR sticklebackJeff-Walkers-imac:MR stickleback walker$ git commit -m "init site" # adds all files  to the local repo, with a commit message
+[master 7b74024] init site
+ 53 files changed, 4517 insertions(+)
+ create mode 100644 .Rhistory
+ create mode 100644 .Rproj.user/2F0424C2/console06/INDEX001
+ create mode 100644 .Rproj.user/2F0424C2/pcs (1)/files-pane.pper
+ create mode 100644 .Rproj.user/2F0424C2/pcs (1)/source-pane.pper
+ create mode 100644 .Rproj.user/2F0424C2/pcs (1)/windowlayoutstate.pper
+ create mode 100644 .Rproj.user/2F0424C2/pcs (1)/workbench-pane.pper
+ create mode 100644 .Rproj.user/2F0424C2/rmd-outputs
+ create mode 100644 .Rproj.user/2F0424C2/saved_source_markers
+ create mode 100644 .Rproj.user/2F0424C2/sources/per/t (1)/9A705C72
+ create mode 100644 .Rproj.user/2F0424C2/sources/per/t (1)/9A705C72-contents
+ create mode 100644 .Rproj.user/2F0424C2/sources/per/t (1)/A66D5D80
+ create mode 100644 .Rproj.user/2F0424C2/sources/per/t (1)/A66D5D80-contents
+ create mode 100644 .Rproj.user/2F0424C2/sources/prop/13CB2EA8
+ create mode 100644 .Rproj.user/2F0424C2/sources/prop/A13D6A6D
+ create mode 100644 .Rproj.user/2F0424C2/sources/prop/INDEX
+ create mode 100644 .Rproj.user/3844950F/console06/55E0C8CC
+ create mode 100644 .Rproj.user/3844950F/console06/55E0C8CC.env
+ create mode 100644 .Rproj.user/3844950F/console06/INDEX001
+ create mode 100644 .Rproj.user/3844950F/pcs/files-pane.pper
+ create mode 100644 .Rproj.user/3844950F/pcs/source-pane.pper
+ create mode 100644 .Rproj.user/3844950F/pcs/windowlayoutstate.pper
+ create mode 100644 .Rproj.user/3844950F/pcs/workbench-pane.pper
+ create mode 100644 .Rproj.user/3844950F/rmd-outputs
+ create mode 100644 .Rproj.user/3844950F/saved_source_markers
+ create mode 100644 .Rproj.user/3844950F/sources/prop/18C8980C
+ create mode 100644 .Rproj.user/3844950F/sources/prop/4AC80C79
+ create mode 100644 .Rproj.user/3844950F/sources/prop/INDEX
+ create mode 100644 .Rproj.user/3844950F/sources/s-71AEE780/B85F5D0C
+ create mode 100644 .Rproj.user/3844950F/sources/s-71AEE780/B85F5D0C-contents
+ create mode 100644 .Rproj.user/3844950F/sources/s-71AEE780/lock_file
+ create mode 100644 .Rproj.user/shared/notebooks/A5196105-Notes_for_lisa_smoluk/1/3844950F71AEE780/chunks.json
+ create mode 100644 .Rproj.user/shared/notebooks/A5196105-Notes_for_lisa_smoluk/1/s/chunks.json
+ create mode 100644 .Rproj.user/shared/notebooks/patch-chunk-names
+ create mode 100644 .Rproj.user/shared/notebooks/paths
+ create mode 100644 MR stickleback.Rproj
+ create mode 100644 R/2014 code/edaII_copy.R
+ create mode 100644 R/Notes_for_lisa_smoluk.Rmd
+ create mode 100644 R/Notes_for_lisa_smoluk.html
+ create mode 100644 R/Notes_for_lisa_smoluk.nb.html
+ create mode 100644 R/Rennison/Code for Jeff Walker copy.R
+ create mode 100644 R/Rennison/Code for Jeff Walker.R
+ create mode 100644 R/Rennison/replicate_rennison.R
+ create mode 100644 R/armor_mr-concordance.tex
+ create mode 100644 R/armor_mr.Rmd
+ create mode 100644 R/armor_mr.html
+ create mode 100644 R/armor_mr.pdf
+ create mode 100644 R/armor_mr_files/figure-html/rennison_code-1.png
+ create mode 100644 R/armor_mr_files/figure-html/rennison_code-2.png
+ create mode 100644 R/armor_mr_files/figure-html/replicateRennisonSize-1.png
+ create mode 100644 R/mendelian_randomization.R
+ create mode 100644 R/replicate.R
+ create mode 100644 data/Marchinko_PaxtonData.xls
+ create mode 100644 data/Rennison et al archive.csv
+]0;~/Documents/Github projects/Lab projects/MR sticklebackJeff-Walkers-imac:MR stickleback walker$ git push origin master # we push the change s from the local git repo to 
+Counting objects: 74, done.
+Delta compression using up to 4 threads.
+Compressing objects:   1% (1/60)   Compressing objects:   3% (2/60)   Compressing objects:   5% (3/60)   Compressing objects:   6% (4/60)   Compressing objects:   8% (5/60)   Compressing objects:  10% (6/60)   Compressing objects:  11% (7/60)   Compressing objects:  13% (8/60)   Compressing objects:  15% (9/60)   Compressing objects:  16% (10/60)   Compressing objects:  18% (11/60)   Compressing objects:  20% (12/60)   Compressing objects:  21% (13/60)   Compressing objects:  23% (14/60)   Compressing objects:  25% (15/60)   Compressing objects:  26% (16/60)   Compressing objects:  28% (17/60)   Compressing objects:  30% (18/60)   Compressing objects:  31% (19/60)   Compressing objects:  33% (20/60)   Compressing objects:  35% (21/60)   Compressing objects:  36% (22/60)   Compressing objects:  38% (23/60)   Compressing objects:  40% (24/60)   Compressing objects:  41% (25/60)   Compressing objects:  43% (26/60)   Compressing objects:  45% (27/60)   Compressing objects:  46% (28/60)   Compressing objects:  48% (29/60)   Compressing objects:  50% (30/60)   Compressing objects:  51% (31/60)   Compressing objects:  53% (32/60)   Compressing objects:  55% (33/60)   Compressing objects:  56% (34/60)   Compressing objects:  58% (35/60)   Compressing objects:  60% (36/60)   Compressing objects:  61% (37/60)   Compressing objects:  63% (38/60)   Compressing objects:  65% (39/60)   Compressing objects:  66% (40/60)   Compressing objects:  68% (41/60)   Compressing objects:  70% (42/60)   Compressing objects:  71% (43/60)   Compressing objects:  73% (44/60)   Compressing objects:  75% (45/60)   Compressing objects:  76% (46/60)   Compressing objects:  78% (47/60)   Compressing objects:  80% (48/60)   Compressing objects:  81% (49/60)   Compressing objects:  83% (50/60)   Compressing objects:  85% (51/60)   Compressing objects:  86% (52/60)   Compressing objects:  88% (53/60)   Compressing objects:  90% (54/60)   Compressing objects:  91% (55/60)   Compressing objects:  93% (56/60)   Compressing objects:  95% (57/60)   Compressing objects:  96% (58/60)   Compressing objects:  98% (59/60)   Compressing objects: 100% (60/60)   Compressing objects: 100% (60/60), done.
+Writing objects:   1% (1/74)   Writing objects:   2% (2/74)   Writing objects:   4% (3/74)   Writing objects:   5% (4/74)   Writing objects:   6% (5/74)   Writing objects:   8% (6/74)   Writing objects:   9% (7/74)   Writing objects:  10% (8/74)   Writing objects:  12% (9/74)   Writing objects:  13% (10/74)   Writing objects:  14% (11/74)   Writing objects:  16% (12/74)   Writing objects:  17% (13/74)   Writing objects:  18% (14/74)   Writing objects:  20% (15/74)   Writing objects:  21% (16/74)   Writing objects:  22% (17/74)   Writing objects:  25% (19/74)   Writing objects:  27% (20/74)   Writing objects:  28% (21/74)   Writing objects:  29% (22/74)   Writing objects:  31% (23/74)   Writing objects:  32% (24/74)   Writing objects:  33% (25/74)   Writing objects:  35% (26/74)   Writing objects:  36% (27/74)   Writing objects:  37% (28/74)   Writing objects:  39% (29/74)   Writing objects:  40% (30/74)   Writing objects:  41% (31/74)   Writing objects:  43% (32/74)   Writing objects:  44% (33/74)   Writing objects:  45% (34/74)   Writing objects:  47% (35/74)   Writing objects:  48% (36/74)   Writing objects:  50% (37/74)   Writing objects:  51% (38/74)   Writing objects:  52% (39/74)   Writing objects:  54% (40/74)   Writing objects:  55% (41/74)   Writing objects:  56% (42/74)   Writing objects:  58% (43/74)   Writing objects:  59% (44/74)   Writing objects:  60% (45/74)   Writing objects:  62% (46/74)   Writing objects:  63% (47/74)   Writing objects:  64% (48/74)   Writing objects:  66% (49/74)   Writing objects:  67% (50/74)   Writing objects:  68% (51/74)   Writing objects:  70% (52/74)   Writing objects:  71% (53/74)   Writing objects:  72% (54/74)   Writing objects:  74% (55/74)   Writing objects:  77% (57/74)   Writing objects:  78% (58/74)   Writing objects:  79% (59/74)   Writing objects:  81% (60/74)   Writing objects:  82% (61/74)   Writing objects:  83% (62/74)   Writing objects:  85% (63/74)   Writing objects:  86% (64/74)   Writing objects:  87% (65/74)   Writing objects:  89% (66/74)   Writing objects:  90% (67/74)   Writing objects:  91% (68/74)   Writing objects:  93% (69/74)   Writing objects:  94% (70/74)   Writing objects:  95% (71/74)   Writing objects:  97% (72/74)   Writing objects:  98% (73/74)   Writing objects: 100% (74/74)   Writing objects: 100% (74/74), 1.00 MiB | 7.17 MiB/s, done.
+Total 74 (delta 6), reused 0 (delta 0)
+remote: Resolving deltas:   0% (0/6)   [Kremote: Resolving deltas:  16% (1/6)   [Kremote: Resolving deltas:  50% (3/6)   [Kremote: Resolving deltas:  83% (5/6)   [Kremote: Resolving deltas: 100% (6/6)   [Kremote: Resolving deltas: 100% (6/6), done.[K
+To github.com:middleprofessor/mr-stickleback.git
+   c4e0fb9..7b74024  master -> master
+]0;~/Documents/Github projects/Lab projects/MR sticklebackJeff-Walkers-imac:MR stickleback walker$ git branch gh-pages
+]0;~/Documents/Github projects/Lab projects/MR sticklebackJeff-Walkers-imac:MR stickleback walker$ git push -u origin gh-pages # Push the new  branch back to github
+
+Total 0 (delta 0), reused 0 (delta 0)
+To github.com:middleprofessor/mr-stickleback.git
+ * [new branch]      gh-pages -> gh-pages
+Branch gh-pages set up to track remote branch gh-pages from origin.
 ]0;~/Documents/Github projects/Lab projects/MR sticklebackJeff-Walkers-imac:MR stickleback walker$ 
+]0;~/Documents/Github projects/Lab projects/MR sticklebackJeff-Walkers-imac:MR stickleback walker$ git push -u origin gh-pages # Push the new bbranch back to github[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[24Pbranch gh-pages
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cpush origin master # we push the changess from the local git repo to [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccommit -m "init site" # adds all files to the local repo, with a commit message[A[C[C[C[C[Cadd . # indexes all files that wil be ad[18Pded to the local repo
