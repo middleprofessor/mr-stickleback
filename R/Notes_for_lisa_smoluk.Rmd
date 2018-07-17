@@ -1,0 +1,27 @@
+---
+title: "Notes for Lisa Smoluk"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Rennison reproducibility
+
+## Can we reproduce Table 1 from these methods?
+
+>We estimated selection coefficients (standardized partial regression coefficients) using the method for cross-sectional data (Lande and Arnold 1983)
+
+\begin{equation}
+\beta = P^{-1} [x_{after} - x_{before}],
+\end{equation}
+
+> where $\beta$ is the vector of estimated selection coefficients, **x** is the vector of means of the focal phenotype trait and genotype scores (hereafter, traits) before and after selection, and **P** is the matrix of variances and covariances of the traits before selection. Separate analyses were carried out for the two episodes of selection, one between September and October 2006 and the other between October and November 2006 (fig. 1).
+
+> The vectors of trait means included the size-adjusted number of plates as the focal phenotypic trait. Genotype was scored using two genotype indicator variables. The first genotype variable (additive) coded the LL genotype as  1, the CL genotype as 0, and the CC genotype as 1. The second genotype variable (dominance) coded homozygous genotypes (LL and CC) as 0 and the heterozygotes (CL) as 1. All selection coefficients were standardized by multiplying each partial regression coefficient by the standard deviation of the trait before selection to allow comparison between trait and genotype scores measured on different scales (Lande and Arnold 1983). Since Eda genotype is categorical and lateral plate number is numerical, the method used here is an analysis of co- variance to tease apart the contributions of genotype and plates to relative survival. Note that $\beta$ is not strictly a selection gradient because the traits do not have a multivariate normal distribution.
+
+[method for univariate selection coefficients skipped]
+
+> For simplicity, our analysis used size-adjusted lateral plates. However, we carried out an additional analysis in which size (standard length) was included as a trait along with unadjusted lateral plate number and Eda genotype. To accommodate the nonlinear relationship between plate number and size, it was necessary to adjust the standard length of the largest individuals to a maximum of 34.0 mm, the estimated breakpoint (fig. A1). The results of this analysis were not quantitatively different from the simpler analysis using size-adjusted plates, and so we do not present it.
+
+> To simplify further, our first analysis excluded the LL genotype and retained the CL and CC genotypes (table 1). In this case, there is only one genotype variable in the linear model (CL is scored as 1, and CC is scored as 0), which incorporates the dominance component of the Eda geno- type but also half the additive component. This simplifi- cation is justified because the CC and CL genotypes have high variance (table A2) and overlap in plate number, which is required to disentangle the separate effects of plates and genotypes on fitness. The variance-covariance matrices for the one-genotype analysis are given in tables A3 and A4 (one for each pair of months). In contrast, there is little plate number variation within the LL genotype and little overlap in plate number with the other genotypes. A second analysis that included the LL genotype and the dominance variable is reported in the online appendix (table A1; see tables A5, A6 for the variance-covariance matrices).
+

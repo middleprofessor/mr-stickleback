@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1531829546172.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1674675799",
+    "id" : "B85F5D0C",
+    "lastKnownWriteTime" : 1531831301,
+    "last_content_update" : 1531831301838,
+    "path" : "~/Documents/Github projects/Lab projects/MR stickleback/R/Notes_for_lisa_smoluk.Rmd",
+    "project_path" : "R/Notes_for_lisa_smoluk.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "cursorPosition" : "9,3",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

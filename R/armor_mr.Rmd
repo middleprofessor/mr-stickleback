@@ -1,0 +1,533 @@
+---
+title: "MR stickleback"
+author: "Jeff Walker"
+date: "April 5, 2018"
+output:
+  bookdown::html_document2: default
+  pdf_document: default
+header-includes:
+- \usepackage{tikz}
+- \usetikzlibrary{positioning}
+---
+
+# History
+```{r}
+# reboot Aug 9 2013
+# reboot II April 5 2018
+```
+The original motivation was a Mendelian Randomization re-analysis of
+Marchinko, K.B., 2009. Predation's role in repeated phenotypic and genetic divergence of armor in threespine stickleback. Evolution, 63(1), pp.127-138.
+The new goal is to add the Schluter xxx data.
+
+We need a DAG model of the potential paths. The LaTeX script only creates an image in the pdf. So the script is run to create the pdf, then re-run to create the html/pdf.
+
+<!--   \begin{tikzpicture} -->
+<!-- 		\node (1) {$Z_{eda}$}; -->
+<!-- 		\node[right=of 1] (2) {$X_{armor}$}; -->
+<!-- 		\node[right=of 2] (3) {$Y_w$}; -->
+<!-- 		\node[below=of 1] (4) {$U_g$}; -->
+<!-- 		\node[below=of 2] (5) {$U_x$}; -->
+<!-- 		\node[above=of 2] (6) {$X_{SL}$}; -->
+<!-- 		\draw [->] (1) -- node[above,font=\footnotesize]{$\beta_1$} (2); -->
+<!-- 		\draw [->] (2) -- node[above,font=\footnotesize]{$\beta_2$} (3); -->
+<!-- 		\draw [->] (1) -- node[above,pos=.3,font=\footnotesize]{$\beta_3$} (5); -->
+<!-- 		\draw [->] (5) -- node[below,font=\footnotesize]{$\beta_4$} (3); -->
+<!-- 		\draw [->] (4) -- node[below,pos=.3,font=\footnotesize]{$\beta_5$} (2); -->
+<!-- 		\draw [->] (4) -- node[below,font=\footnotesize]{$\beta_6$} (5); -->
+<!-- 		\draw [->] (6) -- node[above,font=\footnotesize]{$\beta_7$} (3); -->
+<!-- 		\draw [->] (1) -- node[above,font=\footnotesize]{$\beta_8$} (6); -->
+<!-- 		\draw [->] (1) to[bend right=25] node[left,font=\footnotesize]{$r1$} (4); -->
+<!-- 		\draw [->] (4) [bend left=25] to (1); -->
+<!-- 		\draw [->] (2) to[bend left=25] node[right,font=\footnotesize]{$r2.z$} (6); -->
+<!-- 		\draw [->] (6) [bend right=25] to (2); -->
+<!-- 	\end{tikzpicture} -->
+
+```{r path, echo=FALSE, fig.cap="Full model."}
+dir_path <- "images/" # for console
+dir_path <- "../images/" # for knit
+image_path <- paste(dir_path, "path.png", sep="")
+knitr::include_graphics(image_path)
+  
+```
+
+MR estimates $\beta_2$. An unbiased Mendelian randomization (MR) estimate of $\beta_2$ assumes
+
+1. $\beta_3 \beta_4 = 0$
+2. $r \beta_6 \beta_4 = 0$
+
+The estimate of the "direct selection on" $X_{armor}$ ($\beta_2$), conditioning on $Z_{eda}$, is an unbiased estimate of $\beta_2$ if
+
+1. $\beta_5 \beta_6 \beta_4 = 0$
+
+# Load libraries
+
+```{r libraries, message=FALSE, warning=FALSE}
+library(readxl)
+library(lme4)
+library(ggplot2)
+library(data.table)
+
+source("../R/replicate.R") # for knit, drop the "../" for console
+source("../R/mendelian_randomization.R") # for knit, drop the "../" for console
+
+```
+
+# Import Rennison data
+```{r Rennison}
+dir_path <- "data/" # for console
+dir_path <- "../data/" # for knit
+file_name <- "Rennison et al archive.csv"
+file_path <- paste(dir_path, file_name, sep='')
+rennison <- data.table(fread(file_path))
+rennison[, month:=factor(month, c('06-Sep', '06-Oct', '06-Nov'))]
+rennison[, genotype:=factor(genotype)]
+
+```
+
+# Replicate Rennison
+## Replicate size adjustment
+### Using fixed effects model (ANCOVA)
+It would be good to simulate process to know how sensitive result is to adjustment vs. simply using length as covariate in linear model.
+
+The script attempts to use a function within data.table but limiting the analysis to length < 34.0. While the fit is only on data with length < 34.0, data.table is giving the predicted value for all data. This seems to work after re-starting.
+
+```{r replicateRennisonSize}
+# plot plates vs. size
+qplot(x=length, y=raw.plate.total, data=rennison)
+# check size adjustment - can't replicate
+rennison[, adj.logplates_rep1:=ifelse(length < 34.0, size_corrected(raw.logplates[length < 34.0], length[length < 34.0], origin=34.0), raw.logplates), by=.(genotype)]
+# limit adjusted plates to max of log(32)
+rennison[, adj.logplates_rep1:=ifelse(adj.logplates_rep1 > log(32), log(32), adj.logplates_rep1)]
+
+# check on the math of above - the above is not fitting on the subset of length < 34
+  # x <- rennison[genotype=='CL' & length< 34, raw.logplates]
+  # sl <- rennison[genotype=='CL' & length< 34, length]
+# fit <- lm(x~sl)
+# x_34 <- predict(fit, newdata=data.frame(sl=34.0))
+# logplates.s <- x_34 + residuals(fit) 
+
+
+```
+
+The ANCOVA model doesn't replicate.
+```{r replicateRennisonSizeANCOVA}
+
+  fit <- lm(raw.logplates ~ length*genotype, data=rennison[length < 34.0,])
+
+  # # residuals for all data (not just length <= 34)
+  # rennison[, logplates.resid:=raw.logplates - predict(fit, data.frame(length=length, genotype=genotype))]
+  # # predicted value for all data at length=34.0 mm
+  # rennison[, logplat.hat34:=predict(fit, data.frame(length=34.0, genotype=genotype))]
+  # # adjusted values
+  # rennison[, logplates.s2b:=ifelse(length <= 34, logplat.hat34 + logplates.resid, raw.logplates)]
+  
+  # if length < 34.0 mm then value is predicted value at length=34 (conditional on genotype) plus residual value (conditional on length*genotype)
+  rennison[, adj.logplates_rep2:=ifelse(length < 34,
+                    predict(fit, data.frame(length=34.0, genotype=genotype)) + 
+                    raw.logplates - predict(fit, data.frame(length=length, genotype=genotype)),
+                    raw.logplates)]
+  # limit adjusted plates to max of log(32)
+  rennison[, adj.logplates_rep2:=ifelse(adj.logplates_rep2 > log(32), log(32), adj.logplates_rep2)]
+
+```
+
+### Replicate size adjustment using Rennison et al. script
+E-mail from Rennison on April 08, 2018 states that online dataset not full dataset. Using Rennison script, I can compute the estimate of the breakpoint $k$ in the nls function and then re-run ANCOVA without the NLS. Same to 2nd to 3rd decimal place.
+
+```{r rennison_code}
+# change logplates to raw.logplates
+
+fit <- nls(raw.logplates ~  (a + b * length) * as.numeric(genotype == "CC" & length<=k) + 
+             (a + b * k) * as.numeric(genotype == "CC" & length>k) +
+             (c + d * length) * as.numeric(genotype == "CL" & length<=k) +
+             (c + d * k) * as.numeric(genotype == "CL" & length>k) +
+             (e + f * length) * as.numeric(genotype == "LL" & length<=k) +
+             (e + f * k) * as.numeric(genotype == "LL" & length>k),
+           data=rennison, algorithm = "default",
+           start=list(a=1, c=1, e=1, b=0.1, d=0.1, f=0.1, k=34), control=list(warnOnly=TRUE))
+
+rennison[, adj.logplates_rep3:=ifelse(length < 34,
+              predict(fit, data.frame(length=34.0, genotype=genotype)) + 
+              raw.logplates - predict(fit, data.frame(length=length, genotype=genotype)),
+              raw.logplates)]
+  rennison[, adj.logplates_rep3:=ifelse(adj.logplates_rep3 > log(32), log(32), adj.logplates_rep3)]
+
+# rerun my routine with k=34.639958.
+
+  fit <- lm(raw.logplates ~ length*genotype, data=rennison[length < 34.639958,])
+  rennison[, adj.logplates_rep4:=ifelse(length < 34,
+                    predict(fit, data.frame(length=34.0, genotype=genotype)) + 
+                    raw.logplates - predict(fit, data.frame(length=length, genotype=genotype)),
+                    raw.logplates)]
+  # limit adjusted plates to max of log(32)
+  rennison[, adj.logplates_rep4:=ifelse(adj.logplates_rep4 > log(32), log(32), adj.logplates_rep4)]
+
+  # compare
+  qplot(x=adj.logplates, y=adj.logplates_rep4, data=rennison)
+  qplot(x=adj.logplates_rep3, y=adj.logplates_rep4, data=rennison)
+  
+  rennison[, adj.plates_rep4:=exp(adj.logplates_rep4)]
+
+```
+
+
+### Using multilevel model
+
+```{r rennisonSizeMLM}
+  fit <- lmer(raw.logplates ~ length+ genotype + (1|genotype), data=rennison)
+  
+
+```
+
+
+## Replicate multivariate selection differentials
+
+### Bootstrap not including size adjustment, using Rennison data
+The bootstrap implemented below does not bootstrap the whole process including the length standardization step. Re-sampling should account for the variability in frequency of CC and CL genotypes (so this frequency is not fixed every iteration)
+
+```{r replicateRennisonDifferentials1}
+
+# get frequencies of genotype x month within each month
+freqs <- cbind(
+  rennison[genotype!='LL', .(Nj=.N), by=.(genotype, month)],
+  N=rep(rennison[genotype!='LL', .(N=.N), by=.(month)][, N], each=2))
+freqs[, f:=Nj/N] 
+
+# following Rennison code, use frequencies from Barrett 2008, which is larger dataset
+freq_sept <- c(0.47, 0.53) # CC=0, CL=1
+freq_oct <- c(0.7, 0.3)
+freq_nov <- c(0.54, 0.46)
+
+niter <- 9999
+ycols <- c('adj.plates', 'eda_dom')
+Xa <- rennison[month==levels(month)[1] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xa, old='eda_dom', new='genotype')
+Xb <- rennison[month==levels(month)[2] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xb, old='eda_dom', new='genotype')
+# mv_selection_differential <- function(Xa, Xb, freq_a=NULL, freq_b=NULL, bootstrap=FALSE, niter=4999){
+res1 <- mv_selection_differential(Xa, Xb, codes=c(0,1), freq_a=freq_sept, freq_b=freq_oct, bootstrap=TRUE, niter=niter)
+apply(res1, 2, mean)
+table1.rep1 <- apply(res1,2, quantile, c(0.025, 0.5, 0.975))
+
+Xa <- rennison[month==levels(month)[2] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xa, old='eda_dom', new='genotype')
+Xb <- rennison[month==levels(month)[3] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xb, old='eda_dom', new='genotype')
+res2 <- mv_selection_differential(Xa, Xb, codes=c(0,1), freq_a=freq_oct, freq_b=freq_nov, bootstrap=TRUE)
+table2.rep1 <- apply(res2,2, quantile, c(0.025, 0.5, 0.975))
+
+# 
+```
+
+### Bootstrap not including size adjustment, using rep4 data
+How much does including the size adjustment in the bootstrap matter in the error? For this, I need the estimate using my adjustment routine, not within the bootstrap as the basis of comparison
+
+The bootstrap implemented below **does not bootstrap the whole process** including the length standardization step
+```{r replicateRennisonDifferentials2}
+# following Rennison code, use frequencies from Barrett 2008, which is larger dataset
+freq_sept <- c(0.47, 0.53) # CC=0, CL=1
+freq_oct <- c(0.7, 0.3)
+freq_nov <- c(0.54, 0.46)
+
+ycols <- c('adj.plates_rep4', 'eda_dom')
+niter <- 9999
+
+Xa <- rennison[month==levels(month)[1] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xa, old='eda_dom', new='genotype')
+Xb <- rennison[month==levels(month)[2] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xb, old='eda_dom', new='genotype')
+# mv_selection_differential <- function(Xa, Xb, freq_a=NULL, freq_b=NULL, bootstrap=FALSE, niter=4999){
+res1 <- mv_selection_differential(Xa, Xb, codes=c(0,1), freq_a=freq_sept, freq_b=freq_oct, bootstrap=TRUE, niter=niter)
+table1.rep4.mean <- apply(res1, 2, mean)
+table1.rep4 <- apply(res1,2, quantile, c(0.025, 0.5, 0.975))
+
+Xa <- rennison[month==levels(month)[2] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xa, old='eda_dom', new='genotype')
+Xb <- rennison[month==levels(month)[3] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xb, old='eda_dom', new='genotype')
+res2 <- mv_selection_differential(Xa, Xb, codes=c(0,1), freq_a=freq_oct, freq_b=freq_nov, bootstrap=TRUE, niter=niter)
+table2.rep4.mean <- apply(res2, 2, mean)
+table2.rep4 <- apply(res2,2, quantile, c(0.025, 0.5, 0.975))
+# 
+```
+
+### Bootstrap including size adjustment, using rep4 data
+
+```{r replicateRennisonDifferentials3}
+# following Rennison code, use frequencies from Barrett 2008, which is larger dataset
+freq_sept <- c(0.47, 0.53) # CC=0, CL=1
+freq_oct <- c(0.7, 0.3)
+freq_nov <- c(0.54, 0.46)
+
+ycols <- c('length', 'raw.logplates', 'eda_dom')
+niter <- 9999
+
+Xa <- rennison[month==levels(month)[1] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xa, old='eda_dom', new='genotype')
+Xb <- rennison[month==levels(month)[2] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xb, old='eda_dom', new='genotype')
+# mv_selection_differential <- function(Xa, Xb, freq_a=NULL, freq_b=NULL, bootstrap=FALSE, niter=4999){
+res1 <- mv_selection_differential(Xa, Xb, codes=c(0,1), freq_a=freq_sept, freq_b=freq_oct, adjust=TRUE, bootstrap=TRUE, niter=niter)
+table1.rep4b.mean <- apply(res1, 2, mean)
+table1.rep4b <- apply(res1,2, quantile, c(0.025, 0.5, 0.975))
+
+Xa <- rennison[month==levels(month)[2] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xa, old='eda_dom', new='genotype')
+Xb <- rennison[month==levels(month)[3] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xb, old='eda_dom', new='genotype')
+res2 <- mv_selection_differential(Xa, Xb, codes=c(0,1), freq_a=freq_oct, freq_b=freq_nov, bootstrap=TRUE, niter=niter)
+table2.rep4.mean <- apply(res2, 2, mean)
+table2.rep4b <- apply(res2,2, quantile, c(0.025, 0.5, 0.975))
+
+  # compare
+  table1.rep1 # original data
+  table1.rep4 # my size adjusted
+  table1.rep4b # bootstrapped size adjusted
+
+```
+
+# Rennison Mendelian Randomization
+
+note that can use published estimates or meta-analytic estimates of B_zx
+
+## Using size-adjusted lateral plate counts following Rennison analysis
+
+### Rennison adjustments old code
+Doesn't use the 2008 Barrett frequencies of genotype
+```{r rennisonMR}
+inc <- c(which(rennison[eda_add!=-1, month]=='06-Sep'), which(rennison[eda_add!=-1, month]=='06-Oct'))
+x <- rennison[inc, adj.plates]
+y <- rennison[inc, month]
+y <- factor(as.character(y), c('06-Sep', '06-Oct'))
+z <- rennison[inc, eda_dom]
+res <- mendelian_randomization(x,y,z,std=TRUE, bootstrap=TRUE)
+table1.mr.rep1 <- apply(res,2, quantile, c(0.025, 0.5, 0.975))
+
+inc <- c(which(rennison[eda_add!=-1, month]=='06-Oct'), which(rennison[eda_add!=-1, month]=='06-Nov'))
+x <- rennison[inc, adj.plates]
+y <- rennison[inc, month]
+y <- factor(as.character(y), c('06-Oct', '06-Nov'))
+z <- rennison[inc, eda_dom]
+res <- mendelian_randomization(x,y,z,std=TRUE, bootstrap=TRUE)
+table2.mr.rep1 <- apply(res,2, quantile, c(0.025, 0.5, 0.975))
+
+```
+
+### Rennison adjustment with modified multivariate selection differential code
+
+```{r rennisonMRnew}
+# following Rennison code, use frequencies from Barrett 2008, which is larger dataset
+freq_sept <- c(0.47, 0.53) # CC=0, CL=1
+freq_oct <- c(0.7, 0.3)
+freq_nov <- c(0.54, 0.46)
+
+ycols <- c('adj.plates', 'eda_dom')
+Xa <- rennison[month==levels(month)[1] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xa, old='eda_dom', new='genotype')
+Xb <- rennison[month==levels(month)[2] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xb, old='eda_dom', new='genotype')
+# mr_selection_differential <- function(Xa, Xb, codes=NULL, freq_a=NULL, freq_b=NULL, bootstrap=FALSE, niter=4999){
+res1 <- mr_selection_differential(Xa, Xb, codes=c(0,1), freq_a=freq_sept, freq_b=freq_oct, bootstrap=TRUE)
+table1.mr.rep2 <- apply(res1,2, quantile, c(0.025, 0.5, 0.975))
+
+Xa <- rennison[month==levels(month)[2] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xa, old='eda_dom', new='genotype')
+Xb <- rennison[month==levels(month)[3] & eda_add!=-1, .SD, .SDcols=ycols]
+setnames(Xb, old='eda_dom', new='genotype')
+res2 <- mr_selection_differential(Xa, Xb, codes=c(0,1), freq_a=freq_oct, freq_b=freq_nov, bootstrap=TRUE)
+table2.mr.rep2 <- apply(res2,2, quantile, c(0.025, 0.5, 0.975))
+
+```
+
+# Marchinko analysis
+## Import Marchinko data
+
+```{r marchinko}
+dir_path <- "data/" # for console
+#dir_path <- "../data/" # for knit
+file_name <- "Marchinko_PaxtonData.xls"
+file_path <- paste(dir_path, file_name, sep='')
+
+marchinko <- data.table(read_excel(file_path))
+	# columns are
+		# population
+		# family
+		# treatment {no = -insect, pred = +insect}
+		# individual
+		# standlength
+		# ant.dorspine
+		# sec.dorspine
+		# pelspine.len
+		# pelgirdle.len
+		# plate.number
+		# eda.genotype {AA, Aa, aa}
+		# pelgirdle.presence {1=yes, 0 = no}
+		# pelspine.presence {1 = yes, 0 = no}
+
+  marchinko[, family:=factor(family)]
+  marchinko[, treatment:=factor(treatment, c('no','pred'))]
+# additive model of eda
+marchinko[, eda_add:=ifelse(eda.genotype=="aa",-1,ifelse(eda.genotype=="Aa",0,1))]
+# dominance model of eda
+marchinko[, eda_dom:=ifelse(eda.genotype=="aa",0,1)]
+
+```
+
+## Replicate Marchinko
+
+### Replicate using fixed effects model
+
+Replication requires scaling armor variables within families and replacing values=0.0 with NA. Still, I cannot replicate *ant.dorspine.s*
+```{r replicate}
+  table_1_replicate <- round(replicate_marchinko(marchinko),3)
+```
+
+### Re-analysis using multi-level model
+
+```{r mlm}
+
+y_list <- c('ant.dorspine', 'sec.dorspine', 'pelspine.len', 'pelgirdle.len')
+table_1_mlm <- numeric(length(y_list))
+for(j in 1:length(y_list)){
+  y <- y_list[j]
+  # fit to get treatment effect
+  model_formula <- formula(paste(y, " ~ standlength + treatment + (standlength|family)", sep=''))
+  fit <- lmer(model_formula, data=marchinko)
+  b_xy <- coefficients(summary(fit))['treatmentpred', 'Estimate']
+  # get sd from control group only
+  model_formula <- formula(paste(y, " ~ standlength + (standlength|family)", sep=''))
+  fit <- lmer(model_formula, data=marchinko[treatment=='no',])
+  sd_x <- unlist(as.data.table(VarCorr(fit))[grp=='Residual','sdcor'])
+  sd_x <- 1
+  table_1_mlm[j] <- b_xy/sd_x
+}
+table_1_mlm
+
+```
+
+## Mendelian randomization of Marchinko armor data
+### MR of lateral plate data
+
+```{r marchinkoLateralPlate}
+# Scale plate count
+# first explore, row 192, 19, 52 are conspicuous outliers
+qplot(x=standlength, y=plate.number, data=marchinko)
+fit <- lm(plate.number ~ standlength, data=marchinko)
+fitlog <- lm(plate.number ~ log(standlength), data=marchinko)
+plot(fit)
+plot(fitlog)
+coefficients(lmer(plate.number ~ standlength + (1|family), data=marchinko[treatment=='no',]))
+
+
+xcol <- 'plate.number'
+zcol <- 'eda.genotype'
+covcol <- 'standlength'
+randcol <- 'family'
+
+Xa <- marchinko[treatment=='no', .SD, .SDcols=c(xcol, zcol, covcol, randcol)]
+Xb <- marchinko[treatment=='pred', .SD, .SDcols=c(xcol, zcol, covcol, randcol)]
+
+#2SLS
+# include standardlength in both?
+qplot(x=eda_add, y=plate.number, data=marchinko)
+fit <- lmer(plate.number ~ standlength + eda_add + (1|family), data=marchinko[treatment=='no',])
+x_res <- predict(fit, newdata=marchinko) - marchinko$plate.number
+
+fit <- lmer(x_res ~ treatment*standlength + (1|family), data=marchinko)
+b_xy_mr <- coefficients(summary(fit))['treatmentpred', 'Estimate']
+
+# get sd_x from control group only and from non-RM model
+fit <- lmer(plate.number ~ standlength + (standlength|family), data=marchinko[treatment=='no',])
+sd_x <- unlist(as.data.table(VarCorr(fit))[grp=='Residual','sdcor'])
+
+b_xy_mr_prime <- b_xy_mr/sd_x
+
+#2SLS
+niter <- 2000
+B_colnames <- c('b_zy', 'b_zx', 'r_zx', 'b_xy', 'b_xy_prime', 'beta_xy', 'beta_xy_prime')
+B <- matrix(NA, nrow=niter, ncol=length(B_colnames))
+colnames(B) <- B_colnames
+inc <- 1:nrow(marchinko)
+for(iter in 1:niter){
+  # first use residuals of plates on length
+  dt <- marchinko[inc,]
+  fit <- lmer(plate.number ~ standlength*eda.genotype + (1|family), data=dt[treatment=='no',], na.action="na.exclude")
+  dt[, plate_res:=predict(fit, newdata=dt)-plate.number]
+
+  # selection differential on genotype
+  fit <- lmer(eda_add ~ treatment + (1|family), data=dt, na.action="na.exclude")
+  B[iter, 'b_zy'] <- coefficients(summary(fit))['treatmentpred', 'Estimate']
+
+  # selection differential on phenotype
+  fit <- lmer(plate_res ~ treatment + (1|family), data=dt, na.action="na.exclude")
+  B[iter, 'b_xy'] <- coefficients(summary(fit))['treatmentpred', 'Estimate']
+
+  # stage 1
+  fit1 <- lmer(plate_res ~ eda_add + (1|family), data=dt[treatment=='no',], na.action="na.exclude")
+  B[iter, 'b_zx'] <- coefficients(summary(fit1))['eda_add', 'Estimate']
+  x_res <-predict(fit1, newdata=dt) - dt$plate_res
+  
+  fit2 <- lmer(x_res ~ treatment + (1|family), data=dt, na.action="na.exclude")
+  B[iter, 'beta_xy']  <- coefficients(summary(fit2))['treatmentpred', 'Estimate']
+  
+  # get sd_x from control group only
+  fit <- lmer(plate_res ~ 1 + (1|family), data=dt[treatment=='no',], na.action="na.exclude")
+  sd_x <- unlist(as.data.table(VarCorr(fit))[grp=='Residual','sdcor'])
+  
+  B[iter, 'b_xy_prime']  <- B[iter, 'b_xy']/sd_x
+  B[iter, 'beta_xy_prime']  <- B[iter, 'beta_xy']/sd_x
+  inc <- sample(1:nrow(marchinko), replace=TRUE)
+}
+
+apply(B, 2, quantile, c(0.025, 0.5, 0.975), na.rm=TRUE)
+
+
+```
+
+## MR of armor complex
+It doesn't make sense to compute this for each armor trait separately because then by definition there assumptions are violated (Z has a path to W independent of X). Possible solution here: "Multivariable Mendelian randomization: the use of pleiotropic genetic variants to estimate causal effects", doi: 10.1093/aje/kwu283.
+
+$\beta_{zy}$ is the treatment effect on *eda* genotype. 
+```{r betaZY}
+# additive model of eda
+marchinko[, eda_add:=ifelse(eda.genotype=="aa",-1,ifelse(eda.genotype=="Aa",0,1))]
+# dominance model of eda
+marchinko[, eda_dom:=ifelse(eda.genotype=="aa",0,1)]
+
+fit <- lmer(eda_add ~ treatment + (1|family), data=marchinko)
+b_zy <- coefficients(summary(fit))['treatmentpred', 'Estimate']
+
+```
+
+$\beta_{zx}$ is the effect of *eda* genotype on armor phenotype in the control group.
+
+```{r betaZX}
+p <- length(y_list)
+b_zx <- numeric(p)
+sd_x <- numeric(p)
+b_zx_prime <- numeric(p)
+table_1_mr <- numeric(p)
+table_1_mr_prime <- numeric(p)
+for(j in 1:length(y_list)){
+  y <- y_list[j]
+  # fit to get treatment effect
+  model_formula <- formula(paste(y, " ~ standlength + eda_add + (standlength|family)", sep=''))
+  fit <- lmer(model_formula, data=marchinko[treatment=='no'])
+  b_zx[j] <- coefficients(summary(fit))['eda_add', 'Estimate']
+  
+  # get sd_x from control group only and from non-RM model
+  model_formula <- formula(paste(y, " ~ standlength + (standlength|family)", sep=''))
+  fit <- lmer(model_formula, data=marchinko[treatment=='no',])
+  sd_x[j] <- unlist(as.data.table(VarCorr(fit))[grp=='Residual','sdcor'])
+  
+  table_1_mr[j] <- b_zy/b_zx[j]
+  b_zx_prime[j] <- b_zx[j]*(sd_z/sd_x[j])
+  table_1_mr_prime[j] <- b_zy_prime/b_zx_prime[j]
+}
+table_1_mr
+table_1_mr_prime
+table_1_mlm
+table_1_replicate
+```
+
+

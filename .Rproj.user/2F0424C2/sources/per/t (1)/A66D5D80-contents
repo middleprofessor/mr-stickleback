@@ -1,0 +1,100 @@
+---
+title: "Svedlow eBird Data"
+output: html_notebook
+---
+
+```{r libraries}
+library(data.table)
+library(ggplot2)
+```
+
+#Import Data
+
+```{r import}
+file_path<-'../Data/svedlow_ebird.txt'
+svedlow<-fread(input=file_path)
+svedlow
+```
+
+#Color Graph
+
+```{r}
+plot<-ggplot(data=svedlow, aes(x=Year, y=arrival, color=species))+
+  geom_point()+
+  geom_smooth(method=lm)+
+  NULL
+plot
+```
+
+
+#One species
+```{r}
+species1<-'ALFL_ydayMED'
+svedlow_subset1<-svedlow[species==species1]
+species1_plot<-ggplot(data=svedlow_subset1, aes(x=Year, y=arrival))+
+  geom_point()+
+  geom_smooth(method=lm)+
+  NULL
+species1_plot
+```
+#Linear Model
+```{r linear model}
+fit_species1<-lm(arrival~Year, data=svedlow_subset1)
+summary(fit_species1)
+```
+
+#Coefficients
+
+```{r}
+species1<-'ALFL_ydayMED'
+svedlow_subset1<-svedlow[species==species1]
+fit_species1<-lm(arrival~Year, data=svedlow_subset1)
+coefficients(fit_species1)
+```
+
+#Coefficients for all species
+
+```{r}
+bird_species<-unique(svedlow$species)
+n_bird_species<-length(bird_species)
+fit_svedlow_subset<-NULL
+coefficients<-NULL
+for(i in 1:n_bird_species){
+  species_i<-bird_species[i]
+  svedlow_subset<-svedlow[species==species_i,]
+  fit_svedlow_subset[[i]]<-lm(arrival~Year, data=svedlow_subset)
+  coefficients[[i]]<-coefficients(fit_svedlow_subset[[i]])
+}
+coefficients
+```
+
+
+#w/ Names
+
+```{r}
+bird_species<-unique(svedlow$species)
+n_bird_species<-length(bird_species)
+fit_svedlow_subset<-NULL
+coefficients<-NULL
+for(i in bird_species){
+  svedlow_subset<-svedlow[species==i,]
+  fit_svedlow_subset[[i]]<-lm(arrival~Year, data=svedlow_subset)
+  coefficients[[i]]<-coefficients(fit_svedlow_subset[[i]])
+}
+coefficients
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

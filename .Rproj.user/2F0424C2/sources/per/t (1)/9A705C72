@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1531245593258.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3528564717",
+    "id" : "9A705C72",
+    "lastKnownWriteTime" : 1531246122,
+    "last_content_update" : 1531246122999,
+    "path" : "/Volumes/GoogleDrive/My Drive/Research/Lab projects/MR stickleback/R/armor_mr.Rmd",
+    "project_path" : "R/armor_mr.Rmd",
+    "properties" : {
+        "cursorPosition" : "120,21",
+        "scrollLine" : "110"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
